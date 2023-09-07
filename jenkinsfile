@@ -8,7 +8,7 @@ pipeline {
         stages {
             stage('Cloning our Git') {
     steps {
-            git 'https://github.com/waqarashraf3/DevOpsClassCodes.git'
+            git ['https://github.com/waqarashraf3/dockerjenkins.git branch:'main']
         }
     }
     stage('Building our image') {
