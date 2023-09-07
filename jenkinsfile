@@ -6,35 +6,40 @@ pipeline {
   }
   agent any
   stages {
-    stage(‘Cloning Git’) {
+    stage('Checkout') {
       steps {
-        git([url: ‘https: //github.com/adithyak21/simple-docker.git', branch: ‘main’])
+        checkout scmGit(branches: [
+          [name: '*/main']
+        ], extensions: [], userRemoteConfigs: [
+          [url: 'https://github.com/waqarashraf3/dockerjenkins.git']
+        ])
+      }
+    }
+  }
+  stage(‘Building image’) {
+    steps {
+      script {
+        dockerImage = docker.build imagename
+      }
+    }
+  }
+  stage(‘Running image’) {
+    steps {
+      script {
+        sh“ docker run $ {
+          imagename
+        }: latest”
+      }
+    }
+  }
+  stage(‘Deploy Image’) {
+      steps {
+        script {
+          docker.withRegistry(‘’, registryCredential) {
+            dockerImage.push(“$BUILD_NUMBER”)
+            dockerImage.push(‘latest’)
           }
         }
-        stage(‘Building image’) {
-          steps {
-            script {
-              dockerImage = docker.build imagename
-            }
-          }
-        }
-        stage(‘Running image’) {
-          steps {
-            script {
-              sh“ docker run $ {
-                imagename
-              }: latest”
-            }
-          }
-        }
-        stage(‘Deploy Image’) {
-          steps {
-            script {
-              docker.withRegistry(‘’, registryCredential) {
-                dockerImage.push(“$BUILD_NUMBER”)
-                dockerImage.push(‘latest’)
-              }
-            }
           }
         }
       }
